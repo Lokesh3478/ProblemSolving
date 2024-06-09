@@ -1,0 +1,19 @@
+class Solution {
+    public int subarraysDivByK(int[] nums, int k) {
+        int map[] = new int[k];
+        map[0] = 1;
+        int sum = 0;
+        int count = 0;
+        int i=0;
+        for(int num : nums){
+            sum+=num;
+            int rem = sum%k;
+            if(rem<0)rem+=k;
+            if(map[rem]>0){
+                count+=map[rem];
+            }
+            map[rem]++;
+        }
+        return count;
+    }
+}
