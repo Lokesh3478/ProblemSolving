@@ -6,7 +6,7 @@ ancestor, then we eliminate that edge from the graph.
 
 /* 
 Greedy Approach: To maximize the number of edges we can remove, we need to create a union set of common paths first, 
-then handle the individual paths for Alice and Bob.
+then handle the individual paths for Alice and Bob. 
 */
 
 class Union {
