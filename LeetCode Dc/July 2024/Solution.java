@@ -19,7 +19,8 @@ class Solution {
         return false;
     }
 
-    //2.7.24 LeetCode DC 350
+    //2.7.24 LeetCode DC 350. Intersection of Two Arrays II
+    
      public int[] intersect(int[] nums1, int[] nums2) {
         int n1 = nums1.length; int n2 = nums2.length;
         int min = 1000; int max = 0;
@@ -70,5 +71,68 @@ class Solution {
             resArr[i] = res.get(i);
         }
         return resArr;
+    }
+
+
+
+    
+    //3.7.24 LeetCode DC 1509. Minimum Difference Between Largest and Smallest Value in Three Moves
+    
+    /*As per question description to minimize the range by replacing a num into any num, it is clear that we can
+    remove any num from list by making it zero to minimize the range we can remove extremes that is max and min
+    as we are given three moves, the three moves can be split in following ways 
+                                  min          max        range
+                                  1             2      arr[n-3] - arr[1]
+                                  0             3      arr[n-4] - arr[0]
+                                  2             1      arr[n-2]-arr[2]
+                                  3             0      arr[n]-arr[3]
+    */
+    public int minDifference(int[] nums) {
+        //if length <=3 change all elements to zero if 4 change all elements to minimum value of array
+        //Both result in zero
+        if(nums.length<=4){
+            return 0;
+        }
+        //To find first 4 max and 4 min we can perform selection sort and after each selection we can shrink our sort space
+        int n = nums.length;
+        //Do it untill four selections or for half of array
+        for(int i=0;i<Math.min(4,n/2);i++){
+            moveMaxtoEnd(nums,i);
+            moveMintoEnd(nums,i);
+        }
+        return Math.min(
+            nums[n-1]-nums[3],Math.min(
+                nums[n-4]-nums[0],Math.min(
+                    nums[n-3]-nums[1],nums[n-2]-nums[2]
+                )
+            )
+        );
+    }
+    public void moveMaxtoEnd(int nums[],int rank){
+        //Consider current rank as current max ind
+        int rangeMaxInd = rank;
+        //Search within current rank to end-current rank
+        //as already they are sorted by previous selections
+        for(int i=rank;i<nums.length-rank;i++){
+            if(nums[i]>nums[rangeMaxInd]){
+                rangeMaxInd = i;
+            }
+        }
+        //swap current rank element with the current max element
+        int swap = nums[nums.length-1-rank];
+        nums[nums.length-1-rank] = nums[rangeMaxInd];
+        nums[rangeMaxInd] = swap;
+    }
+    //Same applier for min
+    public void moveMintoEnd(int nums[],int rank){
+        int rangeMinInd = rank;
+        for(int i=rank;i<nums.length-rank;i++){
+            if(nums[i]<nums[rangeMinInd]){
+                rangeMinInd = i;
+            }
+        }
+        int swap = nums[rank];
+        nums[rank] = nums[rangeMinInd];
+        nums[rangeMinInd]=swap;
     }
 }
