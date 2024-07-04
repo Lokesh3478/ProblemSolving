@@ -19,6 +19,8 @@ class Solution {
         return false;
     }
 
+
+    
     //2.7.24 LeetCode DC 350. Intersection of Two Arrays II
     
      public int[] intersect(int[] nums1, int[] nums2) {
@@ -136,3 +138,34 @@ class Solution {
         nums[rangeMinInd]=swap;
     }
 }
+
+//4.7.24 LeetCode DC 2181. Merge Nodes in Between Zeros
+/*The idea is to sum all elements between two zeroes and move the sum to later zero and link the nodes that
+are initially had zeroes in it
+*/
+public ListNode mergeNodes(ListNode head) {
+    //Initialize iterator to head
+        ListNode iterator = head;
+    //Initialize prev to head to link the nodes
+        ListNode prev = iterator;
+    //Traverse until the last node
+        while(iterator!=null&&iterator.next!=null){
+            //Initialize current sum to zero
+            int sum = 0;
+            //Move to next non zero node
+            iterator = iterator.next;
+            //Traverse unitl next zero appears
+            while(iterator!=null&&iterator.val!=0){
+                sum+=iterator.val;
+                iterator = iterator.next;
+            }
+            //Change the value of zero valued node to sum
+            iterator.val = sum;
+            //Link the zero valued node as previous zero nodes next
+            prev.next = iterator;
+            //Set current zero node as previous node
+            prev = prev.next;
+        }   
+        return head.next;
+
+    }
