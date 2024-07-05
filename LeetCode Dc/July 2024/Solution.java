@@ -137,7 +137,6 @@ class Solution {
         nums[rank] = nums[rangeMinInd];
         nums[rangeMinInd]=swap;
     }
-}
 
 //4.7.24 LeetCode DC 2181. Merge Nodes in Between Zeros
 /*The idea is to sum all elements between two zeroes and move the sum to later zero and link the nodes that
@@ -169,3 +168,64 @@ public ListNode mergeNodes(ListNode head) {
         return head.next;
 
     }
+
+
+    //LeetCode DC 2058. Find the Minimum and Maximum Number of Nodes Between Critical Points
+
+    /*The idea is to use three pointers to keep track of critical points, If any critical point found perform the following operations
+    Initialize first and last pointer as -1 and -1
+    if first pointer is -1 upon a critical point detection then change it to current index
+    after that upon each crirtcal point update min by min(min,index-last)
+    and update last to index
+    As min going to be one of those adjacent element distance
+    and max going to be last and firsr critical point distance
+    */
+    public int[] nodesBetweenCriticalPoints(ListNode head) {
+    int min = Integer.MAX_VALUE; // Initialize min to maximum possible value
+    int first = -1, last = -1; // Initialize first and last critical points to -1 (not found)
+    int prevInd = 0; // Initialize previous critical point index
+
+    // Check if the list is too short to have any critical points
+    if (head == null || head.next == null) {
+        return new int[]{-1, -1}; // Return {-1, -1} if the list has less than 2 nodes
+    }
+
+    ListNode prev = head; // Start with the first node as previous node
+    ListNode curr = head.next; // Start with the second node as current node
+    int index = 1; // Index of the current node
+
+    // Traverse the list until the current node and its next node are not null
+    while (curr != null && curr.next != null) {
+        // Check if current node is a critical point (local minima or maxima)
+        if ((prev.val < curr.val && curr.val > curr.next.val) ||
+            (prev.val > curr.val && curr.val < curr.next.val)) {
+            
+            // If first critical point is not set, set it
+            if (first == -1) {
+                first = index;
+                prevInd = index; // Set previous critical point index
+            } else {
+                // Update last critical point
+                last = index;
+                // Calculate the minimum distance between consecutive critical points
+                min = Math.min(min, last - prevInd);
+                prevInd = index; // Update previous critical point index
+            }
+        }
+
+        // Move to the next node
+        index++;
+        prev = curr;
+        curr = curr.next;
+    }
+
+    // If less than two critical points found, return {-1, -1}
+    if (first == -1 || last == -1) {
+        return new int[]{-1, -1};
+    }
+
+    // Return the minimum distance and the distance between the first and last critical points
+    return new int[]{min, last - first};
+}
+
+}
