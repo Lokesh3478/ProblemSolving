@@ -170,7 +170,7 @@ public ListNode mergeNodes(ListNode head) {
     }
 
 
-    //LeetCode DC 2058. Find the Minimum and Maximum Number of Nodes Between Critical Points
+    //5.7.24 LeetCode DC 2058. Find the Minimum and Maximum Number of Nodes Between Critical Points
 
     /*The idea is to use three pointers to keep track of critical points, If any critical point found perform the following operations
     Initialize first and last pointer as -1 and -1
@@ -227,5 +227,52 @@ public ListNode mergeNodes(ListNode head) {
     // Return the minimum distance and the distance between the first and last critical points
     return new int[]{min, last - first};
 }
+
+
+//6.7.24 Leetcode DC 2582. Pass the Pillow
+    /*On each complete pass the pillow reaches the other and the remaining passes can be counted from end if the complete passes is odd
+    or from beginning if the complete passes are even
+    */
+    public int passThePillow(int n, int time) {
+        int completePasses = time/(n-1);
+        if(completePasses%2==0){
+            return 1+ (time-(completePasses*(n-1)));
+        }
+        return n-(time-(completePasses*(n-1)));
+    }
+
+//7.7.24 1518. Water Bottles
+public int numWaterBottles(int numBottles, int numExchange) {
+    int count = 0; // Initialize the count of consumed bottles
+    
+    // Continue the process as long as we have enough bottles to exchange for a new one
+    while (numBottles >= numExchange) {
+        int k = numBottles / numExchange; // Calculate how many new bottles we can get
+        int currentConsume = k * numExchange; // Calculate the number of bottles consumed in this iteration
+        count += currentConsume; // Add the consumed bottles to the total count
+        numBottles = numBottles - currentConsume + k; // Update the number of bottles: subtract consumed, add new full bottles
+    }
+    
+    // Add any remaining bottles that cannot be exchanged to the total count
+    return count + numBottles;
+}
+
+//8.7.24 1823. Find the Winner of the Circular Game
+public int findTheWinner(int n, int k) {
+        int q[] = new int[n];
+        for(int i =1;i<=n;i++){
+            q[i-1] = i;
+        }
+        int front =0,rear = n,pointer=0;
+        while(rear!=1){
+            pointer = (pointer+k-1)%rear;
+            q[pointer%rear] = -1;
+            for(int j=pointer%rear;j<rear-1;j++){
+                q[j] = q[j+1];
+            }
+            rear--;
+        }   
+        return q[front];
+    }
 
 }
