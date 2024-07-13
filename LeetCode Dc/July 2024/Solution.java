@@ -275,4 +275,172 @@ public int findTheWinner(int n, int k) {
         return q[front];
     }
 
+//LeetCode DC 9.7.24 1701. Average Waiting Time
+public double averageWaitingTime(int[][] customers) {
+    double sum = 0;  // Initialize sum to store the total waiting time
+    int current = 0;  // Initialize current to keep track of the current time
+
+    // Loop through each customer
+    for(int[] o : customers){
+        // If the current time is less than the customer's arrival time, update current time to the customer's arrival time
+        if(current < o[0]){
+            current = o[0];
+        }
+
+        // Add the service time to the current time
+        current += o[1];
+
+        // Calculate the waiting time for this customer and add it to sum
+        // Use modulo to prevent overflow (although it may not be necessary here)
+        sum += (current - o[0]) % Math.pow(2, 31);
+    }
+
+    // Calculate and return the average waiting time
+    return sum / customers.length;
+}
+
+//10.7.24 LeetCode DC 1598. Crawler Log Folder
+public int minOperations(String[] logs) {
+        int stkSize = 0;
+        for (String log: logs) {
+            stkSize += add(log,stkSize);
+        }
+        return stkSize;
+    }
+    private int add(String log, int res) {
+        return log.charAt(1) == '.' ? res == 0 ? 0 : -1 : log.charAt(0) == '.' ? 0 : 1;
+    }
+
+//11.7.24 LeetCode DC 1190. Reverse Substrings Between Each Pair of Parentheses
+public String reverseParentheses(String s) {
+        Stack<Character> stk = new Stack<>();
+        
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            
+            if (c == ')') {
+                // When encountering a closing parenthesis, start to pop and reverse
+                StringBuilder temp = new StringBuilder();
+                while (!stk.isEmpty() && stk.peek() != '(') {
+                    temp.append(stk.pop());
+                }
+                if (!stk.isEmpty() && stk.peek() == '(') {
+                    stk.pop(); // remove the matching '('
+                }
+                // Push reversed characters back onto the stack
+                for (int j = 0; j < temp.length(); j++) {
+                    stk.push(temp.charAt(j));
+                }
+            } else {
+                // Push current character to the stack
+                stk.push(c);
+            }
+        }
+        StringBuilder res = new StringBuilder();
+        while (!stk.isEmpty()) {
+            res.insert(0, stk.pop());
+        }
+        return res.toString();
+    }
+
+    //12.7.24 LeetCode DC 1717. Maximum Score From Removing Substrings
+
+    public int maximumGain(String s, int x, int y) {
+        Stack<Character>stk = new Stack<>();
+        String pref1 = x>y?"ab":"ba";
+        String pref2 = pref1=="ab"?"ba":"ab";
+        int count = 0;
+        for(char ch : s.toCharArray()){
+            if(ch==pref1.charAt(1)){
+                if(!stk.isEmpty()&&stk.peek()==pref1.charAt(0)){
+                    count+=Math.max(x,y);
+                    stk.pop();
+                }
+                else{
+                    stk.push(ch);
+                }
+            }
+            else{
+                stk.push(ch);
+            }
+        }
+        s = "";
+        for(char ch : stk){
+            s+=ch;
+        }
+        stk.clear();
+        for(char ch : s.toCharArray()){
+            if(ch==pref2.charAt(1)){
+                if(!stk.isEmpty()&&stk.peek()==pref2.charAt(0)){
+                    count+=Math.min(x,y);
+                    stk.pop();
+                }
+                else {
+                   stk.push(ch);
+                }
+            }
+            else{
+                stk.push(ch);
+            }
+        }
+        return count;
+    }
+
+//13.7.24 LeetCode DC 2751. Robot Collisions
+public List<Integer> survivedRobotsHealths(int[] positions, int[] healths, String directions) {
+        HashMap<Integer,Integer>indices = new LinkedHashMap<>();
+        for(int i=0;i<positions.length;i++){
+            indices.put(positions[i],i);
+        }
+        ArrayList<Integer>survivors = new ArrayList<>();
+        Stack<Integer>stack = new Stack<>();
+        int sorted[] =(Arrays.copyOf(positions,positions.length));
+        Arrays.sort(sorted);
+        for(int num : sorted){
+            if(directions.charAt(indices.get(num))=='R'||stack.isEmpty()){
+                stack.push(num);
+            }
+            else{
+                boolean added = true;;
+                int top = stack.peek();
+                while(!stack.isEmpty()&&directions.charAt(indices.get(top))=='R'){
+                    if(healths[indices.get(top)]==healths[indices.get(num)]){
+                        healths[indices.get(top)]=0;
+                        healths[indices.get(num)]=0;
+                        stack.pop();
+                        added = false;
+                        break;
+                    }
+                    else if(healths[indices.get(top)]>healths[indices.get(num)]){
+                        healths[indices.get(top)]--;
+                        healths[indices.get(num)]=0;
+                        added= false;
+                        break;
+                    }
+                    else{
+                        healths[indices.get(num)]--;
+                        healths[indices.get(top)] = 0;
+                        stack.pop();
+                    }
+                    if(!stack.isEmpty()){
+                        top = stack.peek();
+                    }
+                    else{
+                        break;
+                    }
+                }
+                if(added){
+                    stack.push(num);
+                }
+            }
+        }
+        for(int num : healths){
+            if(num!=0){
+                survivors.add(num);
+            }
+        }
+        return survivors;
+    }
+
+
 }
