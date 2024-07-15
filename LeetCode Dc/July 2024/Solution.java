@@ -441,6 +441,148 @@ public List<Integer> survivedRobotsHealths(int[] positions, int[] healths, Strin
         }
         return survivors;
     }
+//14-7-24 LeetCode DC726. Number of Atoms
+/*Given a string formula representing a chemical formula, return the count of each atom.
+The atomic element always starts with an uppercase character, then zero or more lowercase letters, representing the name.
+One or more digits representing that element's count may follow if the count is greater than 1. If the count is 1, no digits will follow.
+Two formulas are concatenated together to produce another formula.
+A formula placed in parentheses, and a count (optionally added) is also a formula.*/
+/*Solutuon Approach
+use a hashmap to keep track of each element
+Since there may be nested elements like (()), use a stack of hashmap to assign nested values to 
+correct set of elements.
+Create a stack of hashmap,
+if'(' add a new map to stack and add the element present in it to the map
+if an upper case if found , form the element till lowecase element are present after uppercase
+Now look for digits after the element, if no digits formed map it with 0,
+add these to top map of stack
+if ')' is found look for number after ')' bracket if no number found make it 1 
+multiply it with top map of stack 
+merge top two maps.
+The number of maps is equal to number of openBrackets + one non nested
+the order is however reduced to one as each hashmap opened due to'(' is closed at ')'
+as the string is always valid
+*/
+    public boolean isLower(char ch) {
+            return (ch >= 'a' && ch <= 'z');
+    }
 
+    public boolean isNumber(char ch) {
+        return (ch >= '0' && ch <= '9');
+    }
+
+    public String countOfAtoms(String formula) {
+        Stack<HashMap<String, Integer>> stack = new Stack<>();
+        stack.push(new LinkedHashMap<>());
+        int ptr = 0;
+
+        while (ptr < formula.length()) {
+            if (formula.charAt(ptr) == '(') {
+                stack.push(new LinkedHashMap<>());
+                ptr++;
+                continue;
+            } else if (formula.charAt(ptr) == ')') {
+                ptr++;
+                int count = 0;
+                while (ptr < formula.length() && isNumber(formula.charAt(ptr))) {
+                    count = count * 10 + (formula.charAt(ptr) - '0');
+                    ptr++;
+                }
+                count = Math.max(count, 1);
+                HashMap<String, Integer> top = stack.pop();
+                HashMap<String, Integer> prevMap = stack.peek();
+                for (String ele : top.keySet()) {
+                    prevMap.put(ele, prevMap.getOrDefault(ele, 0) + top.get(ele) * count);
+                }
+                continue;
+            } else {
+                StringBuilder element = new StringBuilder();
+                element.append(formula.charAt(ptr));
+                ptr++;
+                while (ptr < formula.length() && isLower(formula.charAt(ptr))) {
+                    element.append(formula.charAt(ptr));
+                    ptr++;
+                }
+                int count = 0;
+                while (ptr < formula.length() && isNumber(formula.charAt(ptr))) {
+                    count = count * 10 + (formula.charAt(ptr) - '0');
+                    ptr++;
+                }
+                count = Math.max(count, 1);
+                stack.peek().put(element.toString(), stack.peek().getOrDefault(element.toString(), 0) + count);
+            }
+        }
+
+        HashMap<String, Integer> finalMap = stack.pop();
+        TreeMap<String, Integer> sortedMap = new TreeMap<>(finalMap);
+
+        StringBuilder res = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
+            res.append(entry.getKey());
+            if (entry.getValue() > 1) {
+                res.append(entry.getValue());
+            }
+        }
+        return res.toString();
+    }
+
+    //15-7-24 LeetCode DC 2196. Create Binary Tree From Descriptions
+    public TreeNode createBinaryTree(int[][] descriptions) {
+    // Initialize variables to track the maximum and minimum node values
+    int max = Integer.MIN_VALUE, min = Integer.MAX_VALUE;
+    
+    // Determine the range of node values
+    for(int[] d : descriptions) {
+        max = Math.max(max, Math.max(d[0], d[1]));
+        min = Math.min(min, Math.min(d[0], d[1]));
+    }
+    
+    // Create an array to map node values to TreeNode objects and a boolean array to track non-root nodes
+    TreeNode[] map = new TreeNode[max - min + 1];
+    boolean[] notRoot = new boolean[max - min + 1];
+    
+    // Build the tree from the description array
+    for(int[] d : descriptions) {
+        // Initialize node and child variables
+        TreeNode node = null;
+        TreeNode child = null;
+        
+        // Check if the child node already exists in the map
+        if(map[d[1] - min] != null) {
+            child = map[d[1] - min];
+        } else {
+            // Create a new child node if it does not exist
+            child = new TreeNode(d[1]);
+        }
+        
+        // Set the left or right child based on the description
+        if(d[2] == 1) {
+            // If d[2] is 1, set child as the left child
+            if(map[d[0] - min] != null) {
+                map[d[0] - min].left = child;
+                map[d[1] - min] = map[d[0] - min].left;
+            }
+        } else {
+            // If d[2] is 0, set child as the right child
+            if(map[d[0] - min] != null) {
+                map[d[0] - min].right = child;
+                map[d[1] - min] = map[d[0] - min].right;
+            }
+        }
+        
+        // Mark the child node as not a root
+        notRoot[d[1] - min] = true;
+    }
+    
+    // Identify and return the root node (a node which is not a child of any other node)
+    for(int[] d : descriptions) {
+        if(!notRoot[d[0] - min]) {
+            return map[d[0] - min];
+        }
+    }
+    
+    // Return null if no root node is found (should not happen if input is valid)
+    return null;
+}
 
 }
