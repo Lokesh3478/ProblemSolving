@@ -585,4 +585,208 @@ as the string is always valid
     return null;
 }
 
+//16.7.24 2096. Step-By-Step Directions From a Binary Tree Node to Another
+public String dfs(TreeNode root, int n, StringBuilder path) {
+        if (root == null) {
+            return "";
+        }
+        if (root.val == n) {
+            return path.toString();
+        }
+        
+        // Traverse left
+        path.append('L');
+        String left = dfs(root.left, n, path);
+        if (!left.isEmpty()) {
+            return left;
+        }
+        path.deleteCharAt(path.length() - 1); // backtrack
+
+        // Traverse right
+        path.append('R');
+        String right = dfs(root.right, n, path);
+        if (!right.isEmpty()) {
+            return right;
+        }
+        path.deleteCharAt(path.length() - 1); // backtrack
+
+        return "";
+    }
+
+    // Method to get directions from startValue to destValue in the binary tree
+    public String getDirections(TreeNode root, int startValue, int destValue) {
+        StringBuilder toStartPath = new StringBuilder();
+        StringBuilder toDestPath = new StringBuilder();
+
+        // Get the path to the start node
+        String toStart = dfs(root, startValue, toStartPath);
+        // Get the path to the destination node
+        String toDest = dfs(root, destValue, toDestPath);
+
+        StringBuilder result = new StringBuilder();
+        int p1 = 0, p2 = 0;
+
+        // Find the common path prefix
+        while (p1 < toStart.length() && p2 < toDest.length() &&
+               toStart.charAt(p1) == toDest.charAt(p2)) {
+            p1++;
+            p2++;
+        }
+
+        // Add 'U' for each step back to the common ancestor
+        while (p1 < toStart.length()) {
+            result.append('U');
+            p1++;
+        }
+
+        // Append the remaining path to the destination
+        result.append(toDest.substring(p2));
+        return result.toString();
+    }
+
+    public List<TreeNode> delNodes(TreeNode root, int[] to_delete) {
+    // Initialize a boolean array to mark nodes to delete
+    boolean toDeleteSet[] = new boolean[1000];
+    for (int val : to_delete) {
+        toDeleteSet[val-1] = true; // Mark the nodes to delete
+    }
+
+    ArrayList<TreeNode> forest = new ArrayList<>();
+    root = postOrder(root, toDeleteSet, forest); // Perform post-order traversal
+
+    if (root != null) {
+        forest.add(root); // Add remaining root if not deleted
+    }
+    return forest;
+}
+//17.7.24 1110. Delete Nodes And Return Forest
+    public TreeNode postOrder(TreeNode root, boolean[] toDeleteSet, ArrayList<TreeNode> forest) {
+        if (root != null) {
+            root.left = postOrder(root.left, toDeleteSet, forest); // Traverse left subtree
+            root.right = postOrder(root.right, toDeleteSet, forest); // Traverse right subtree
+    
+            if (toDeleteSet[root.val-1]) { // Check if the current node should be deleted
+                if (root.left != null) {
+                    forest.add(root.left); // Add left child to forest if it exists
+                }
+                if (root.right != null) {
+                    forest.add(root.right); // Add right child to forest if it exists
+                }
+                return null; // Return null to delete the current node
+            } else {
+                return root; // Return the current node if not deleted
+            }
+        }
+        return null; // Return null if the current node is null
+    }
+//18.7.24 1530. Number of Good Leaf Nodes Pairs
+int count = 0;
+
+    // Depth-first search method to find and count pairs of leaf nodes
+    public ArrayList<Integer> dfs(TreeNode root, int max) {
+        ArrayList<Integer> result = new ArrayList<>();
+        if (root == null) {
+            return result; // Return empty list if current node is null
+        }
+        if (root.left == null && root.right == null) {
+            result.add(1); // Add 1 for leaf node
+            return result;
+        }
+
+        ArrayList<Integer> left = dfs(root.left, max); // Traverse left subtree
+        ArrayList<Integer> right = dfs(root.right, max); // Traverse right subtree
+
+        // Count pairs of leaf nodes whose distance is less than or equal to max
+        for (int i = 0; i < left.size(); i++) {
+            for (int j = 0; j < right.size(); j++) {
+                if (left.get(i) + right.get(j) <= max) {
+                    count++;
+                }
+            }
+        }
+
+        // Merge left and right distances, incrementing each by 1
+        result.addAll(left);
+        result.addAll(right);
+        for (int i = 0; i < result.size(); i++) {
+            result.set(i, result.get(i) + 1);
+        }
+        return result;
+    }
+
+    // Method to initiate the DFS and count leaf node pairs
+    public int countPairs(TreeNode root, int distance) {
+        dfs(root, distance); // Call DFS with root and distance
+        return count; // Return the total count of pairs
+    }
+
+//19.7.24 1380. Lucky Numbers in a Matrix
+    public List<Integer> luckyNumbers (int[][] matrix) {
+        int r = matrix.length; // Number of rows in the matrix
+        int c = matrix[0].length; // Number of columns in the matrix
+        int[] min = new int[r]; // Array to store the minimum value of each row
+        int[] max = new int[c]; // Array to store the maximum value of each column
+        int low = Integer.MAX_VALUE, high = 0;
+
+        // Initialize the min array with maximum integer values
+        Arrays.fill(min, Integer.MAX_VALUE);
+
+        ArrayList<Integer> list = new ArrayList<>();
+
+        for (int i = 0; i < Math.max(r, c); i++) {
+            if (i < r) {
+                // Find the minimum value in each row
+                for (int j = 0; j < c; j++) {
+                    min[i] = Math.min(min[i], matrix[i][j]);
+                    low = Math.min(low, min[i]);
+                    high = Math.max(high, min[i]);
+                }
+            }
+            if (i < c) {
+                // Find the maximum value in each column
+                for (int j = 0; j < r; j++) {
+                    max[i] = Math.max(max[i], matrix[j][i]);
+                }
+            }
+        }
+
+        // Create a boolean array to map the minimum values
+        boolean[] map = new boolean[high - low + 1];
+        for (int num : min) {
+            map[num - low] = true;
+        }
+
+        // Check if any maximum value in the columns is also a minimum value in the rows
+        for (int num : max) {
+            if (num >= low && num <= high && map[num - low]) {
+                list.add(num);
+            }
+        }
+
+        return list; // Return the list of lucky numbers
+    }
+    //20.7.24 1605. Find Valid Matrix Given Row and Column Sums
+    // Method to restore a matrix from given row sums and column sums
+    public int[][] restoreMatrix(int[] rowSum, int[] colSum) {
+        int m = rowSum.length; // Number of rows
+        int n = colSum.length; // Number of columns
+        int[][] res = new int[m][n]; // Resultant matrix
+        int i = 0, j = 0; // Row and column indices
+
+        // Iterate through the rows and columns to fill the matrix
+        while (i < m && j < n) {
+            if (rowSum[i] < colSum[j]) {
+                res[i][j] = rowSum[i]; // Assign the row sum to the matrix cell
+                colSum[j] -= rowSum[i]; // Decrease the column sum by the assigned value
+                rowSum[i] = 0; // Set the row sum to 0 after assigning
+                i++; // Move to the next row
+            } else {
+                res[i][j] = colSum[j]; // Assign the column sum to the matrix cell
+                rowSum[i] -= colSum[j]; // Decrease the row sum by the assigned value
+                colSum[j] = 0; // Set the column sum to 0 after assigning
+                j++; // Move to the next column
+            }
+        }
+
+        return res; // Return the restored matrix
 }
