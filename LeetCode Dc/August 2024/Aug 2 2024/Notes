@@ -1,0 +1,10 @@
+Problem : 2134. Minimum Swaps to Group All 1's Together II
+
+Problem Description : A swap is defined as taking two distinct positions in an array and swapping the values in them.
+A circular array is defined as an array where we consider the first element and the last element to be adjacent.
+Given a binary circular array nums, return the minimum number of swaps required to group all 1's present in the array together at any location.
+
+Idea : As the problem demands for clubbing all ones together, we need to first think of how many ones we can club together. 
+The total number of ones we can club togrther is total number of ones present in the given array. Now taking that as size of 
+a fixed window move through each window and check number of ones and number of zeroes.The window with minimum number of zeroes 
+is the answer for swaps.
